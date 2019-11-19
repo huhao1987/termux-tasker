@@ -8,6 +8,8 @@ from [Tasker](https://tasker.dinglisch.net/).
 
 ## Installation
 
+The project is forked from the original one: https://github.com/termux/termux-tasker, I will do some changes for my own update in this project.
+
 Termux:Task application can be obtained from:
 
 - [Google Play](https://play.google.com/store/apps/details?id=com.termux.tasker)
@@ -22,14 +24,15 @@ Signature keys of all offered builds are different. Before you switch the
 installation source, you will have to uninstall the Termux application and
 all currently installed plugins.
 
+
 ## How to use
 
 1. Create a new Tasker Action.
 2. In the resulting Select Action Category dialog, select Plugin.
 3. In the resulting Termux:Task dialog, select Termux:Task.
-4. Edit the configuration to specify the executable in `~/.termux/tasker/` to
-   execute, and if it should be executed in the background (the default) or in a
-   new terminal session.
+(From v0.4_hao)
+4. Give the permission of write and read sotrage, it allows you to choose the folder for scripts on your internal storage of your phone.
+5. Choose the folder which includes your scripts.If you don`t change it, it will be default set as `~/.termux/tasker/` and if it should be executed in the background (the default) or in a new terminal session.
 
 ## License
 
