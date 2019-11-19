@@ -8,13 +8,13 @@
     <string name="plugin_name">Termux</string>
     <string name="select_folder">Select folder</string>
     <string name="execute_in_terminal">Execute in a terminal session</string>
-    <string name="executable_path_hint">Executable in ~/.termux/tasker/</string>
+    <string name="executable_path_hint">Executable in %1$s</string>
 
     <string name="no_tasker_folder_title">No ~/.termux/tasker/ directory</string>
     <string name="no_tasker_folder_message">You need to create a ~/.termux/tasker/ directory containing scripts to be executed.</string>
 
-    <string name="blurb_in_background">Execute ~/.termux/tasker/%1$s %2$s</string>
-    <string name="blurb_in_terminal">Execute ~/.termux/tasker/%1$s %2$s in a terminal session.</string>
+    <string name="blurb_in_background">Execute %1$s %2$s</string>
+    <string name="blurb_in_terminal">Execute %1$s %2$s in a terminal session.</string>
 
     <!-- From Tasker API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>
@@ -23,5 +23,6 @@
     <string name="twofortyfouram_locale_menu_save">Done</string>
     <string name="arguments_hint">Arguments</string>
 
+    <string name="select_file">Select File</string>
 
 </resources>

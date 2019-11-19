@@ -45,7 +45,7 @@ public final class FireReceiver extends BroadcastReceiver {
             list.add(matcher.group(1).replace("\"",""));
         }
 
-        File executableFile = new File(Global.TASKER_DIR, executable);
+        File executableFile = new File(ttSharePerfences.getGlobalDIr(context), executable);
         if (!executableFile.isFile()) {
             String message = "Termux:Tasker - no such executable:\n" + executable;
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();

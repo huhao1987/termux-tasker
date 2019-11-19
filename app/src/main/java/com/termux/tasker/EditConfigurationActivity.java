@@ -14,13 +14,16 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.obsez.android.lib.filechooser.ChooserDialog;
@@ -30,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.termux.tasker.Global.TASKER_DIR;
+import static com.termux.tasker.Global.TASKER_DIRstr;
+
 /**
  * This is the "Edit" activity for a Locale Plug-in.
  * <p>
@@ -44,9 +49,13 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
 
 //    public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.termux/tasker/");
 
+    private Spinner listoffile;
+    private ArrayAdapter<String> fileadapter;
     private AutoCompleteTextView mExecutableText;
     private EditText mArgumentsText;
     private CheckBox mInTerminalCheckbox;
+    private TextView executable_title;
+    private List<String> fileslist;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -55,7 +64,6 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.app_name);
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -72,21 +80,31 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         }
 
         setContentView(R.layout.edit_activity);
-
-        var listoffile=(Spinner)findViewById(R.id.listoffile);
-        ArrayAdapter<String> fileadapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,getFilesAllName(Tas))
+        mExecutableText = findViewById(R.id.executable_path);
+        mArgumentsText = findViewById(R.id.arguments);
+        mInTerminalCheckbox = findViewById(R.id.in_terminal);
+        executable_title=findViewById(R.id.executable_title);
+        listoffile=(Spinner)findViewById(R.id.listoffile);
+        setAdapter();
         Button setfolder=(Button) findViewById(R.id.setfolder);
         setfolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new ChooserDialog(EditConfigurationActivity.this)
                         .withFilter(true, true)
+                        .displayPath(true)
+                        .enableOptions(true)
                         // to handle the result(s)
                         .withChosenListener(new ChooserDialog.Result() {
                             @Override
                             public void onChoosePath(String path, File pathFile) {
                                 Global.TASKER_DIRstr=path;
                                 Global.TASKER_DIR=new File(path);
+                                mExecutableText.setHint(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+                                executable_title.setText(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+                                ttSharePerfences.setGlobalDir(EditConfigurationActivity.this,path);
+                                setAdapter();
+
                             }
                         })
                         .build()
@@ -97,15 +115,6 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         BundleScrubber.scrub(intent);
         final Bundle localeBundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
         BundleScrubber.scrub(localeBundle);
-
-        mExecutableText = findViewById(R.id.executable_path);
-        mArgumentsText = findViewById(R.id.arguments);
-        mInTerminalCheckbox = findViewById(R.id.in_terminal);
-
-        final File[] files = TASKER_DIR.listFiles();
-        final String[] fileNames = new String[files.length];
-        for (int i = 0; i < files.length; i++) fileNames[i] = files[i].getName();
-
         mExecutableText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -120,7 +129,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 final String currentValue = editable.toString();
-                for (String s : fileNames) {
+                for (String s :fileslist ) {
                     if (s.equals(currentValue)) {
                         mExecutableText.setError(null);
                         return;
@@ -130,7 +139,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, fileNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, fileslist);
         mExecutableText.setAdapter(adapter);
 
         if (savedInstanceState == null) {
@@ -145,6 +154,38 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         }
     }
 
+    private void setAdapter(){
+        fileslist=getFilesAllName(Global.TASKER_DIRstr);
+        if(fileadapter!=null)
+        {
+            fileadapter.clear();
+            fileadapter.addAll(fileslist);
+            fileadapter.notifyDataSetChanged();
+        }
+        else {
+            fileadapter = new ArrayAdapter<String>(this, R.layout.row_file, fileslist);
+            listoffile.setAdapter(fileadapter);
+        }
+        TASKER_DIRstr=ttSharePerfences.getGlobalDIr(this);
+        TASKER_DIR=new File(TASKER_DIRstr);
+        mExecutableText.setHint(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+        executable_title.setText(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+        mExecutableText.setCompletionHint(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+        listoffile.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mExecutableText.setHint(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+                executable_title.setText(getResources().getString(R.string.executable_path_hint, TASKER_DIRstr));
+                Log.d("thepositon::",String.valueOf(i));
+                mExecutableText.setText(fileslist.get(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                mExecutableText.setText(fileslist.get(0));
+            }
+        });
+    }
     @Override
     public void finish() {
         if (!isCanceled()) {
@@ -166,7 +207,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
                 final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(), executable, arguments, inTerminal);
 
                 // The blurb is a concise status text to be displayed in the host's UI.
-                final String blurb = generateBlurb(executable, arguments, inTerminal);
+                final String blurb = generateBlurb(Global.TASKER_DIRstr+"/"+executable, arguments, inTerminal);
                 if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
                     TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle,new String[] {PluginBundleManager.EXTRA_EXECUTABLE,
                             PluginBundleManager.EXTRA_ARGUMENTS,PluginBundleManager.EXTRA_TERMINAL});
@@ -189,7 +230,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         final int stringResource = inTerminal ? R.string.blurb_in_terminal : R.string.blurb_in_background;
         final String message =getString(stringResource, executable,arguments);
         final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length.
-        return (message.length() > maxBlurbLength) ? message.substring(0, maxBlurbLength) : message;
+        return message;
     }
 
     public static void verifyStoragePermissions(Activity activity) {
@@ -221,7 +262,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         return null;
         ArrayList<String> s = new ArrayList<>();
         for(int i =0;i<files.length;i++){
-            s.add(files[i].getAbsolutePath());
+            s.add(files[i].getName());
         }
         return s;
     }
