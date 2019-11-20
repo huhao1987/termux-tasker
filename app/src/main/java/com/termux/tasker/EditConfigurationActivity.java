@@ -155,6 +155,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
     }
 
     private void setAdapter(){
+        Global.TASKER_DIRstr=ttSharePerfences.getGlobalDIr(this);
         fileslist=getFilesAllName(Global.TASKER_DIRstr);
         if(fileadapter!=null)
         {
