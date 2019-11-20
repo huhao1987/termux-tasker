@@ -30,6 +30,8 @@ final class PluginBundleManager {
      */
     public static final String EXTRA_TERMINAL = "com.termux.tasker.extra.TERMINAL";
 
+    public static final String EXTRA_TASKER_RESULT = "com.termux.tasker.extra.TASKER_RESULT";
+
     /**
      * Type: {@code int}.
      * <p>

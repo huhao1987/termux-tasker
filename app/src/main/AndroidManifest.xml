@@ -42,6 +42,12 @@
         - The BroadcastReceiver requires permissions not available to Locale
         - There are multiple BroadcastReceivers for com.twofortyfouram.locale.intent.action.FIRE_SETTING
         -->
+        <service android:name="com.joaomgcd.common.tasker.IntentServiceParallel"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>
+            </intent-filter>
+        </service>
         <receiver
             android:name=".FireReceiver"
             android:exported="true"
